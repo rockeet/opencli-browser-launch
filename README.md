@@ -35,56 +35,31 @@ pnpm install
 ## Quick start
 
 ```powershell
-# Windows
 node ~/.cursor/skills/opencli-browser-launch/scripts/launch-browser.mjs
-
-# Or wrapper
-~/.cursor/skills/opencli-browser-launch/scripts/launch-browser.ps1
+# Or: ~/.cursor/skills/opencli-browser-launch/scripts/launch-browser.ps1
 ```
 
-```bash
-# macOS / Linux
-~/.cursor/skills/opencli-browser-launch/scripts/launch-browser.sh
-```
+## Related skills
 
-## Publish to GitHub (self-demo)
-
-This skill can publish itself to GitHub using its own bootstrap flow:
-
-```powershell
-cd ~/.cursor/skills/opencli-browser-launch/scripts
-.\publish-to-github.ps1 -Public
-```
-
-The publish script:
-1. Runs `launch-browser.ps1` (this skill)
-2. Uses `opencli browser open` to smoke-test GitHub access
-3. `git commit` + `gh repo create` + push
-4. Opens the repo page in browser to confirm
+- **opencli-github-publish** — publish local projects to GitHub (uses this skill for browser bootstrap)
+- **opencli-browser** — page automation after launch
 
 ## Directory layout
 
 ```
 opencli-browser-launch/
-├── SKILL.md                          Agent skill instructions
-├── README.md                         This file
+├── SKILL.md
 ├── scripts/
-│   ├── launch-browser.mjs            Main entry (spawn + doctor poll)
-│   ├── launch-browser.ps1 / .sh      Platform wrappers
-│   ├── ensure-*.mjs                  Ensure chain (deps, browser, extension)
-│   ├── publish-to-github.ps1         Self-publish workflow
-│   └── lib/paths.mjs                 Path helpers
+│   ├── launch-browser.mjs
+│   ├── ensure-*.mjs
+│   └── lib/paths.mjs
 └── references/
-    ├── extension-install-research.md PoC results
-    ├── paths.md                      Path reference
-    └── troubleshooting.md            Troubleshooting
 ```
 
 ## Prerequisites
 
 - Node >= 20, pnpm, opencli (global)
 - `opencli daemon` running (default `localhost:19825`)
-- For publish: `gh` CLI authenticated
 
 ## License
 
