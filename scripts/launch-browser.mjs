@@ -187,6 +187,11 @@ function quickDoctorCheck() {
 // ── Step 1: ensure chain ──────────────────────────────────────────────────────
 log('Running ensure chain...');
 
+const opencliResult = spawnSync('node', ['ensure-opencli.mjs'], {
+  cwd: scriptsDir(), stdio: ['ignore', 'pipe', 'inherit'], encoding: 'utf8',
+});
+if (opencliResult.status !== 0) fail('ensure-opencli failed');
+
 const depsResult = spawnSync('node', ['ensure-scripts-deps.mjs'], {
   cwd: scriptsDir(), stdio: ['ignore', 'pipe', 'inherit'], encoding: 'utf8',
 });

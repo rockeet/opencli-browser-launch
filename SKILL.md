@@ -18,8 +18,12 @@
 
 - Node >= 20
 - `pnpm` 在 PATH（`pnpm -v` 可用）
-- `opencli` 全局安装（`opencli doctor` 可用）
-- `opencli daemon` 已运行（默认 `localhost:19825`；未运行时先执行 `opencli daemon`）
+
+> **opencli 和 daemon 会自动安装/启动**——`ensure-opencli.mjs` 会：
+> 1. 检测 `opencli --version`，缺失则 `pnpm add -g @jackwener/opencli`
+> 2. 检测 `opencli daemon status`，未运行则 `opencli daemon` 启动
+>
+> 用户无需手动安装 opencli 或启动 daemon。
 
 ---
 
@@ -69,6 +73,7 @@ node scripts/ensure-extension.mjs [--force] [--version 1.0.15]
 ```
 Agent 触发
   │
+  ├─ ensure-opencli.mjs        ← pnpm add -g @jackwener/opencli + daemon（首次）
   ├─ ensure-scripts-deps.mjs   ← pnpm install playwright（首次）
   ├─ ensure-playwright-browser.mjs  ← pnpm exec playwright install chromium（首次）
   ├─ ensure-extension.mjs      ← 下载/解压扩展到 ~/.opencli/browser-bridge-extension/
