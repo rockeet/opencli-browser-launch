@@ -1,0 +1,7 @@
+scripts/node_modules/
+plugins/**/node_modules/
+plugins/**/package-lock.json
+plugins/**/repos.js
+*.log
+.DS_Store
+Thumbs.db

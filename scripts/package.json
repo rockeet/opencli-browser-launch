@@ -1,0 +1,9 @@
+{
+  "name": "opencli-browser-launch-scripts",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "dependencies": {
+    "playwright": "^1.49.0"
+  }
+}
