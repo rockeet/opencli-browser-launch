@@ -1,6 +1,0 @@
-{
-  "name": "github-trending",
-  "version": "0.1.0",
-  "description": "GitHub Trending repositories (JS fallback for opencli 1.8.0)",
-  "opencli": ">=1.8.0"
-}

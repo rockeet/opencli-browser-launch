@@ -58,10 +58,9 @@ cd ~/.cursor/skills/opencli-browser-launch/scripts
 
 The publish script:
 1. Runs `launch-browser.ps1` (this skill)
-2. Installs `opencli-plugin-github-trending` (visits github.com via browser)
-3. Smoke-tests GitHub access
-4. Uses `opencli browser` to open the repo page
-5. `git init` + `gh repo create` + push
+2. Uses `opencli browser open` to smoke-test GitHub access
+3. `git commit` + `gh repo create` + push
+4. Opens the repo page in browser to confirm
 
 ## Directory layout
 

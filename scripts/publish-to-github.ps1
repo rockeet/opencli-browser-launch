@@ -3,31 +3,30 @@
 #
 # Workflow (uses this skill end-to-end):
 #   1. launch-browser.ps1  — bootstrap Chromium + Browser Bridge extension
-#   2. opencli plugin install github:ByteYue/opencli-plugin-github-trending
-#   3. opencli github-trending repos — smoke-test GitHub via browser
-#   4. opencli browser open — navigate to GitHub repo page (visual verify)
-#   5. git init + gh repo create + push
+#   2. opencli browser open — smoke-test GitHub access via browser
+#   3. git init + gh repo create + push
+#   4. opencli browser open — confirm repo page
 #
 # Usage:
 #   .\publish-to-github.ps1
 #   .\publish-to-github.ps1 -RepoOwner rockeet -RepoName opencli-browser-launch -Public
-#   .\publish-to-github.ps1 -SkipLaunch -SkipPluginTest   # re-push only
+#   .\publish-to-github.ps1 -SkipLaunch -SkipBrowserTest   # re-push only
 
 param(
     [string]$RepoOwner = "rockeet",
     [string]$RepoName  = "opencli-browser-launch",
     [switch]$Public,
     [switch]$SkipLaunch,
-    [switch]$SkipPluginTest,
+    [switch]$SkipBrowserTest,
     [switch]$DryRun
 )
 
 $ErrorActionPreference = "Stop"
 $SkillRoot = Split-Path -Parent $PSScriptRoot
 $ScriptsDir = $PSScriptRoot
-$GithubPlugin = "github:ByteYue/opencli-plugin-github-trending"
 $RepoFull = "$RepoOwner/$RepoName"
 $RepoUrl  = "https://github.com/$RepoFull"
+$sessionName = "publish-$RepoName"
 
 function Write-Step([string]$Msg) {
     Write-Host "`n==> $Msg" -ForegroundColor Cyan
@@ -77,43 +76,25 @@ Write-Step "Verify opencli doctor"
 opencli doctor
 if ($LASTEXITCODE -ne 0) { throw "opencli doctor failed — daemon or extension not connected" }
 
-# ── Step 2: Install GitHub opencli plugin ────────────────────────────────────
-Write-Step "Step 2 — install GitHub opencli plugin (ensure-github-plugin.mjs)"
-$ensureExit = Invoke-External { node "$ScriptsDir\ensure-github-plugin.mjs" }
-if ($ensureExit -ne 0) { throw "ensure-github-plugin.mjs failed (exit $ensureExit)" }
-opencli plugin list
-
-# ── Step 3: Visit GitHub via plugin (browser smoke test) ─────────────────────
-if (-not $SkipPluginTest) {
-    Write-Step "Step 3 — smoke test GitHub via opencli plugin"
+# ── Step 2: Smoke-test GitHub via opencli browser ────────────────────────────
+if (-not $SkipBrowserTest) {
+    Write-Step "Step 2 — smoke test GitHub via opencli browser"
     $smokeOk = $false
     for ($i = 1; $i -le 3; $i++) {
-        opencli github-trending repos --limit 3 -f json 2>&1 | Out-Null
+        opencli browser $sessionName open "https://github.com/$RepoOwner" 2>&1 | Out-Null
         if ($LASTEXITCODE -eq 0) { $smokeOk = $true; break }
         Write-Host "  Attempt $i failed, retrying..."
         Start-Sleep -Seconds 2
     }
-    if (-not $smokeOk) { throw "github-trending repos failed after 3 attempts" }
-    opencli github-trending repos --limit 3 -f json
+    if (-not $smokeOk) { throw "opencli browser failed to open GitHub after 3 attempts" }
+    opencli browser $sessionName state 2>&1 | Select-Object -First 10
     Write-Host "  GitHub access via browser: OK"
 } else {
-    Write-Step "Step 3 — skipped (-SkipPluginTest)"
+    Write-Step "Step 2 — skipped (-SkipBrowserTest)"
 }
 
-# ── Step 4: opencli browser — navigate to target repo page ─────────────────
-Write-Step "Step 4 — opencli browser navigate to GitHub"
-$sessionName = "publish-$RepoName"
-opencli browser $sessionName open $RepoUrl 2>&1
-if ($LASTEXITCODE -ne 0) {
-    # Repo may not exist yet — open GitHub home instead
-    Write-Host "  Repo page not reachable yet, opening github.com ..."
-    opencli browser $sessionName open "https://github.com/$RepoOwner" 2>&1
-}
-opencli browser $sessionName state 2>&1 | Select-Object -First 20
-Write-Host "  Browser session '$sessionName' ready"
-
-# ── Step 5: Git init + commit ────────────────────────────────────────────────
-Write-Step "Step 5 — git init and commit"
+# ── Step 3: Git init + commit ────────────────────────────────────────────────
+Write-Step "Step 3 — git init and commit"
 Set-Location $SkillRoot
 
 if (-not (Test-Path ".git")) {
@@ -126,16 +107,12 @@ $status = git status --porcelain
 if (-not $status) {
     Write-Host "  Nothing to commit — working tree clean"
 } else {
-    git commit -m "Initial release: opencli-browser-launch skill
-
-Bootstrap Chromium + Browser Bridge extension via child_process.spawn.
-Playwright limited to install + executablePath only.
-Includes ensure chain, launch scripts, and references."
+    git commit -m "Update opencli-browser-launch skill"
     if ($LASTEXITCODE -ne 0) { throw "git commit failed" }
 }
 
-# ── Step 6: Create GitHub repo and push ──────────────────────────────────────
-Write-Step "Step 6 — create GitHub repo and push"
+# ── Step 4: Create GitHub repo and push ──────────────────────────────────────
+Write-Step "Step 4 — create GitHub repo and push"
 
 $prevEa = $ErrorActionPreference
 $ErrorActionPreference = 'Continue'
@@ -165,9 +142,9 @@ if ($repoExistsCode -ne 0) {
     }
 }
 
-# ── Step 7: Re-open repo page to confirm ────────────────────────────────────
+# ── Step 5: Confirm repo page in browser ────────────────────────────────────
 if (-not $DryRun) {
-    Write-Step "Step 7 — confirm repo page in browser"
+    Write-Step "Step 5 — confirm repo page in browser"
     opencli browser $sessionName open $RepoUrl 2>&1
     opencli browser $sessionName state 2>&1 | Select-Object -First 10
 }
