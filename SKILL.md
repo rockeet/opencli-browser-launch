@@ -1,4 +1,12 @@
-﻿# opencli-browser-launch
+﻿---
+name: opencli-browser-launch
+description: >-
+  自动 bootstrap 并启动 OpenCLI 专用 Chromium profile（含 Browser Bridge 扩展），
+  通过 opencli doctor 验收后交 opencli-browser 做页面操作。
+  当需要启动 opencli 浏览器、doctor 未绿、或依赖技能要求 bootstrap 浏览器时使用。
+---
+
+# opencli-browser-launch
 
 **用途**：自动 bootstrap 并启动一个专有 Chromium profile（带 Browser Bridge 扩展），供 `opencli browser` 控制。
 

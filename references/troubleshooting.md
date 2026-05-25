@@ -14,8 +14,8 @@
 
 2. **确认扩展文件完整**
    ```powershell
-   Test-Path "$env:USERPROFILE\.openclirowser-bridge-extension\manifest.json"
-   Test-Path "$env:USERPROFILE\.openclirowser-bridge-extension\distackground.js"
+   Test-Path "$env:USERPROFILE\.opencli\browser-bridge-extension\manifest.json"
+   Test-Path "$env:USERPROFILE\.opencli\browser-bridge-extension\dist\background.js"
    ```
 
 3. **强制重新安装扩展**
@@ -28,10 +28,10 @@
    # 找到 Chromium 路径
    $exe = node -e "import('./lib/paths.mjs').then(m => m.getChromiumExecutablePath()).then(p => process.stdout.write(p))"
    # 手动启动
-   & $exe --user-data-dir="$env:USERPROFILE\.opencli\chrome-profiles	est-manual" `
+   & $exe --user-data-dir="$env:USERPROFILE\.opencli\chrome-profiles\test-manual" `
           --disable-web-security `
-          --load-extension="$env:USERPROFILE\.openclirowser-bridge-extension" `
-          --disable-extensions-except="$env:USERPROFILE\.openclirowser-bridge-extension"
+          --load-extension="$env:USERPROFILE\.opencli\browser-bridge-extension" `
+          --disable-extensions-except="$env:USERPROFILE\.opencli\browser-bridge-extension"
    # 等待 5s 后检查
    opencli doctor
    ```
